@@ -59,7 +59,7 @@ def test_investment_errors(client, override_get_db):
     # 1. Invest with Unverified KYC
     res = client.post(
         "/api/v1/ledger/invest",
-        json={"user_id": user_id, "campaign_id": campaign_id, "amount": 100.0, "transaction_type": "investment"},
+        json={"campaign_id": campaign_id, "amount": 100.0, "transaction_type": "investment"},
         headers=headers
     )
     assert res.status_code == 403
@@ -68,20 +68,10 @@ def test_investment_errors(client, override_get_db):
     # 2. Invest in Non-Existent Campaign
     res = client.post(
         "/api/v1/ledger/invest",
-        json={"user_id": user_id, "campaign_id": 99999, "amount": 100.0, "transaction_type": "investment"},
+        json={"campaign_id": 99999, "amount": 100.0, "transaction_type": "investment"},
         headers=headers
     )
     assert res.status_code == 404
     assert "Campaign not found" in res.json()["detail"]
 
-    # 3. Authorization: Invest for Another User
-    other_user_res = client.post("/api/v1/users/", json={"email": "other@example.com", "stripe_id": "cus_other", "password": "password123"})
-    other_id = other_user_res.json()["id"]
-    
-    res = client.post(
-        "/api/v1/ledger/invest",
-        json={"user_id": other_id, "campaign_id": campaign_id, "amount": 100.0, "transaction_type": "investment"},
-        headers=headers
-    )
-    assert res.status_code == 403
-    assert "Not authorized" in res.json()["detail"]
+

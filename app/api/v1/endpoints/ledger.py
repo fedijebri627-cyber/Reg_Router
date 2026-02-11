@@ -21,11 +21,9 @@ def create_investment(
     """
     Create investment (Compliance Router + Turnstile).
     """
-    # Verify the user is investing for themselves
-    if current_user.id != investment_in.user_id:
-        raise HTTPException(status_code=403, detail="Not authorized to invest for another user")
-    
+    # Verify the user is investing for themselves (Implicit via Token)
     user = current_user
+    investment_in__user_id = user.id # Explicitly bind ID from token
     campaign = db.query(models.Campaign).filter(models.Campaign.id == investment_in.campaign_id).first()
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
@@ -97,7 +95,7 @@ def create_investment(
 
     # 4. Create Ledger Entry
     ledger_entry = models.Ledger(
-        user_id=investment_in.user_id,
+        user_id=investment_in__user_id,
         campaign_id=investment_in.campaign_id,
         amount=investment_in.amount,
         transaction_type=investment_in.transaction_type,
@@ -167,6 +165,7 @@ def cancel_investment(
 def trade_secondary_market(
     *,
     db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
     trade_in: schemas.LedgerCreate,
     original_transaction_date: datetime, # simplified for demo
 ) -> Any:
@@ -178,7 +177,7 @@ def trade_secondary_market(
         raise HTTPException(status_code=403, detail="Asset is under 1-year lockup period (SEC Rule 501)")
 
     ledger_entry = models.Ledger(
-        user_id=trade_in.user_id,
+        user_id=current_user.id,
         campaign_id=trade_in.campaign_id,
         amount=trade_in.amount,
         transaction_type=trade_in.transaction_type,

@@ -33,7 +33,6 @@ def test_invest_compliance(client, override_get_db):
     res = client.post(
         "/api/v1/ledger/invest",
         json={
-            "user_id": user_id,
             "campaign_id": campaign_id,
             "amount": 1000.0,
             "transaction_type": "investment"
@@ -55,7 +54,6 @@ def test_invest_compliance(client, override_get_db):
         res = client.post(
             "/api/v1/ledger/invest",
             json={
-                "user_id": user_id,
                 "campaign_id": campaign_id,
                 "amount": 1000.0,
                 "transaction_type": "investment"
@@ -85,7 +83,6 @@ def test_trade_lockup(client, override_get_db):
     res = client.post(
         f"/api/v1/ledger/trade?original_transaction_date={recent_date}",
         json={
-            "user_id": user_id,
             "campaign_id": campaign_id,
             "amount": 100.0,
             "transaction_type": "trade"
@@ -100,7 +97,6 @@ def test_trade_lockup(client, override_get_db):
     res = client.post(
         f"/api/v1/ledger/trade?original_transaction_date={old_date}",
         json={
-            "user_id": user_id,
             "campaign_id": campaign_id,
             "amount": 100.0,
             "transaction_type": "trade"

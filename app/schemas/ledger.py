@@ -8,7 +8,6 @@ class LedgerBase(BaseModel):
     status: Optional[str] = "pending_settlement"
 
 class LedgerCreate(LedgerBase):
-    user_id: int
     campaign_id: int
 
 class LedgerUpdate(LedgerBase):

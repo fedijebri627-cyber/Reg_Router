@@ -50,7 +50,6 @@ Content-Type: application/json
 Authorization: Bearer <token>
 
 {
-  "user_id": 123,
   "campaign_id": 456,
   "amount": 5000.00,
   "transaction_type": "investment"

@@ -73,7 +73,6 @@ def test_investment_limit_exceeded(client, override_get_db, normal_user_token_he
     res = client.post(
         "/api/v1/ledger/invest",
         json={
-            "user_id": user.id,
             "campaign_id": campaign_id,
             "amount": 3000.0,
             "transaction_type": "investment"
@@ -115,7 +114,6 @@ def test_investment_success_with_stripe(client, override_get_db, normal_user_tok
     res = client.post(
         "/api/v1/ledger/invest",
         json={
-            "user_id": user_id,
             "campaign_id": campaign_id,
             "amount": 1000.0,
             "transaction_type": "investment"
