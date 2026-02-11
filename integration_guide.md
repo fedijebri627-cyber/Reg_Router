@@ -138,3 +138,49 @@ For **Reg D 506(c)** deals, investors must be verified manually.
 2.  **Verify**: `POST /api/v1/admin/users/{id}/verify` (Admin approves).
 
 Until verified, `POST /invest` will return `403 Forbidden`.
+
+---
+
+## 5. Developer Experience
+
+### 🧪 Sandbox & Test Data
+Use these "Magic Values" in your Test Environment to trigger specific compliance outcomes.
+
+| Scenario | Income | Investment Amount | Result |
+| :--- | :--- | :--- | :--- |
+| **Success** | `$100,000` | `$500` | `200 OK` (Pending Payment) |
+| **Reg CF Limit** | `$10,000` | `$50,000` | `403 Forbidden` (Limit Exceeded) |
+| **KYC Failure** | - | - | Set `kyc_status="unverified"` in User |
+| **Accredited** | - | - | Set `accreditation_status="VERIFIED_DOCS"` |
+
+### 🛑 Error Codes Reference
+Map these error codes to your UI for a better user experience.
+
+| Error Code | Meaning | User Message Suggestion |
+| :--- | :--- | :--- |
+| `limit_exceeded` | Investment > Reg CF Limit | "You have hit your annual investment limit." |
+| `kyc_unverified` | Identity not verified yet | "Please wait for identity verification." |
+| `cool_off_period` | User < 30 days old (506b) | "You must be a member for 30 days." |
+| `lockup_active` | Asset < 1 year old | "This asset cannot be sold yet." |
+
+### 🔐 Idempotency
+To prevent double-charges during network timeouts, include an `Idempotency-Key` header with a unique value (UUID).
+```http
+Idempotency-Key: <unique-uuid>
+```
+*Note: We forward this key to our banking partners to ensure safe retries.*
+
+### 📡 Verifying Webhooks
+All webhooks include a `Stripe-Signature` (or `X-Reg-Router-Signature`) header. You **must** verify this using your Webhook Secret.
+
+```python
+# Python Example
+event = stripe.Webhook.construct_event(
+    payload, sig_header, endpoint_secret
+)
+```
+
+### 📦 SDKs
+We currently support raw REST API integration.
+*   **Python SDK**: *Coming Soon*
+*   **Node.js SDK**: *Coming Soon*
